@@ -1,18 +1,10 @@
-// import { render } from "@testing-library/react";
-// import e from "express";
 import axios from "./axios";
 import React from "react";
-import { Link } from "react-router-dom"; //for creating links
 
-{
-    /* <Link to="/">Click me to go to registration</Link> */
-}
-
-export class Registration extends React.Component {
+export class Login extends React.Component {
     constructor(props) {
         super(props);
         this.state = {};
-        // this.handleChange = this.handleChange.bind(this);
     }
 
     handleChange(event) {
@@ -23,11 +15,11 @@ export class Registration extends React.Component {
 
     handleSubmit(event) {
         event.preventDefault();
-        console.log("SUBMIT", this.state);
+        // console.log("SUBMIT", this.state);
         axios
-            .post("/register", this.state)
+            .post("/login", this.state)
             .then(({ data }) => {
-                console.log(data);
+                // console.log(data);
                 if (!data.success) {
                     this.setState({
                         error: true,
@@ -49,18 +41,6 @@ export class Registration extends React.Component {
                 )}
                 <form onSubmit={(e) => this.handleSubmit(e)}>
                     <input
-                        name={"firstname"}
-                        placeholder={"First Name"}
-                        required
-                        onChange={this.handleChange}
-                    ></input>
-                    <input
-                        name={"lastname"}
-                        placeholder={"Last Name"}
-                        required
-                        onChange={this.handleChange}
-                    ></input>
-                    <input
                         name={"email"}
                         placeholder={"Email"}
                         required
@@ -74,7 +54,7 @@ export class Registration extends React.Component {
                         type={"password"}
                         onChange={this.handleChange}
                     ></input>
-                    <button type={"submit"}>Submit</button>
+                    <button type={"submit"}>Log in</button>
                 </form>
             </>
         );

@@ -14,6 +14,21 @@ const COOKIE_SECRET =
 app.use(compression());
 app.use(express.json());
 
+app.use(
+    cookieSession({
+        secret: COOKIE_SECRET,
+        maxAge: 1000 * 60 * 60 * 24 * 14,
+        sameSite: "strict",
+    })
+);
+
+app.use(csurf());
+
+app.use(function (req, res, next) {
+    res.cookie("mytoken", req.csrfToken());
+    next();
+});
+
 app.use(express.static(path.join(__dirname, "..", "client", "public")));
 
 app.post("/register", (req, res) => {
@@ -27,17 +42,36 @@ app.post("/register", (req, res) => {
     } else {
         hash(password)
             .then((hashedPw) => {
-                db.registerUser(firstname, lastname, email, hashedPw);
+                return db.registerUser(firstname, lastname, email, hashedPw);
             })
             .then((result) => {
-                console.log(result);
-                // req.session.userId = rows[0].id;
+                console.log({ rows });
+                req.session.userId = rows[0].id;
                 return res.json({
                     success: true,
                 });
             })
             .catch((e) => console.log("error in registration", e));
     }
+});
+
+app.post("/login", (req, res) => {
+    const { email, password } = req.body;
+    if (!email || !password) {
+        return res.json({
+            success: false,
+        });
+    } else {
+        return db.isUser(email).then(({ rows }) => {
+            console.log(rows);
+        });
+    }
+});
+
+app.get("/user/id.json", function (req, res) {
+    res.json({
+        userId: req.session.userId,
+    });
 });
 
 ////////////////////////////////////
