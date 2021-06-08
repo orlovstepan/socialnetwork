@@ -1,10 +1,13 @@
 import axios from "./axios";
 import React from "react";
+import { Link } from "react-router-dom"; //for creating links
 
 export class Login extends React.Component {
     constructor(props) {
         super(props);
         this.state = {};
+        this.handleChange = this.handleChange.bind(this);
+        this.handleSubmit = this.handleSubmit.bind(this);
     }
 
     handleChange(event) {
@@ -19,12 +22,17 @@ export class Login extends React.Component {
         axios
             .post("/login", this.state)
             .then(({ data }) => {
-                // console.log(data);
+                console.log(data);
                 if (!data.success) {
+                    console.log("data.errormsg", data.errorMsg);
                     this.setState({
                         error: true,
+                        errorMsg: data.errorMsg,
                     });
                 } else {
+                    this.setState({
+                        errorMsg: data.errorMsg,
+                    });
                     location.reload();
                 }
             })
@@ -36,9 +44,7 @@ export class Login extends React.Component {
     render() {
         return (
             <>
-                {this.state.error && (
-                    <p>Something went wrong, please try again</p>
-                )}
+                {this.state.error && <p>{this.state.errorMsg}</p>}
                 <form onSubmit={(e) => this.handleSubmit(e)}>
                     <input
                         name={"email"}
@@ -56,6 +62,10 @@ export class Login extends React.Component {
                     ></input>
                     <button type={"submit"}>Log in</button>
                 </form>
+                <h5>
+                    <Link to="/"> Register here </Link> or
+                    <Link to="/reset-password"> reset </Link> your password
+                </h5>
             </>
         );
     }

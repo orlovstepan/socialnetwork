@@ -7,6 +7,8 @@ const csurf = require("csurf");
 // const { hash } = require("bcryptjs");
 const db = require("./db/db");
 const { hash, compare } = require("../utils/bc");
+const cryptoRandomString = require("crypto-random-string");
+const { sendEmail } = require("./ses");
 
 // const requireLoggedInUser = require("../../server/middleware");
 const COOKIE_SECRET =
@@ -44,7 +46,7 @@ app.post("/register", (req, res) => {
             .then((hashedPw) => {
                 return db.registerUser(firstname, lastname, email, hashedPw);
             })
-            .then((result) => {
+            .then(({ rows }) => {
                 console.log({ rows });
                 req.session.userId = rows[0].id;
                 return res.json({
@@ -59,13 +61,89 @@ app.post("/login", (req, res) => {
     const { email, password } = req.body;
     if (!email || !password) {
         return res.json({
+            errorMsg: "Please fill out all the fields",
             success: false,
         });
     } else {
+        let userId;
         return db.isUser(email).then(({ rows }) => {
-            console.log(rows);
+            if (!rows[0]) {
+                return res.json({
+                    success: false,
+                    errorMsg: "Can you check your credentials once again? :(",
+                });
+            }
+            userId = rows[0].id;
+            compare(password, rows[0].password).then((auth) => {
+                req.session.userId = userId;
+                return res.json({
+                    success: true,
+                });
+            });
         });
     }
+});
+
+app.post("/reset-password", (req, res) => {
+    const email = req.body.email;
+    if (!email) {
+        return res.json({
+            errorMsg: "Please enter your email",
+            success: false,
+        });
+    } else {
+        return db
+            .isUser(email)
+            .then(({ rows }) => {
+                if (!rows[0]) {
+                    return res.json({
+                        success: false,
+                        errorMsg:
+                            "Can you check your credentials once again? :(",
+                    });
+                } else {
+                    const secretCode = cryptoRandomString({
+                        length: 6,
+                    });
+                    console.log("secretCode: ", secretCode);
+                    db.resetCode(email, secretCode).then(({ rows }) => {
+                        sendEmail(
+                            email,
+                            secretCode,
+                            "Code for resetting your email"
+                        )
+                            .then((result) => {
+                                return res.json({
+                                    success: true,
+                                });
+                            })
+                            .catch((e) => console.log("error in sendEmail", e));
+                    });
+                }
+            })
+            .catch((e) => console.log("error in db.isUser"));
+    }
+});
+
+app.post("/reset-password-verify", (req, res) => {
+    console.log("req.body in password reset", req.body);
+    const { email, code, newpass } = req.body;
+    db.getResetCode(email, code)
+        .then(({ rows }) => {
+            console.log("rows in reset-password-verify", rows);
+            if (!rows.length) {
+                return res.json({
+                    success: false,
+                    errorMsg: "Sorry, something went wrong, please try again",
+                });
+            } else {
+                return res.json({
+                    success: true,
+                });
+            }
+        })
+        .then(() => db.updatePassword(email, newpass))
+        .catch((e) => console.log("error in reset-password-verify", e));
 });
 
 app.get("/user/id.json", function (req, res) {

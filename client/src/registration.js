@@ -1,18 +1,13 @@
-// import { render } from "@testing-library/react";
-// import e from "express";
 import axios from "./axios";
 import React from "react";
 import { Link } from "react-router-dom"; //for creating links
-
-{
-    /* <Link to="/">Click me to go to registration</Link> */
-}
 
 export class Registration extends React.Component {
     constructor(props) {
         super(props);
         this.state = {};
-        // this.handleChange = this.handleChange.bind(this);
+        this.handleChange = this.handleChange.bind(this);
+        this.handleSubmit = this.handleSubmit.bind(this);
     }
 
     handleChange(event) {
@@ -37,13 +32,14 @@ export class Registration extends React.Component {
                 }
             })
             .catch((err) => {
-                console.log("error in handlesubmit", err);
+                console.log("error in handlesubmit register", err);
             });
     }
 
     render() {
         return (
             <>
+                <h1>Welcome!</h1>
                 {this.state.error && (
                     <p>Something went wrong, please try again</p>
                 )}
@@ -76,6 +72,9 @@ export class Registration extends React.Component {
                     ></input>
                     <button type={"submit"}>Submit</button>
                 </form>
+                <h5>
+                    Or login <Link to="/login"> here</Link>
+                </h5>
             </>
         );
     }
