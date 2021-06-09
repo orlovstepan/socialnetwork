@@ -47,3 +47,21 @@ module.exports.updatePassword = (email, password) => {
     const params = [email, password];
     return db.query(q, params);
 };
+
+module.exports.updateProfilePic = (userId, imgUrl) => {
+    const q = `
+    UPDATE users
+    SET profile_pic = $2 WHERE id = $1
+    RETURNING *
+    `;
+    const params = [userId, imgUrl];
+    return db.query(q, params);
+};
+
+module.exports.getUserData = (userId) => {
+    const q = `
+    SELECT * FROM users WHERE id = $1
+    `;
+    const params = [userId];
+    return db.query(q, params);
+};

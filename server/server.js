@@ -9,10 +9,32 @@ const db = require("./db/db");
 const { hash, compare } = require("../utils/bc");
 const cryptoRandomString = require("crypto-random-string");
 const { sendEmail } = require("./ses");
+const multer = require("multer");
+const s3 = require("../s3");
+const uidSafe = require("uid-safe");
 
 // const requireLoggedInUser = require("../../server/middleware");
 const COOKIE_SECRET =
     process.env.COOKIE_SECRET || require("../secrets.json").COOKIE_SECRET;
+
+const storage = multer.diskStorage({
+    destination(req, file, callback) {
+        callback(null, __dirname + "/uploads");
+    },
+    filename(req, file, callback) {
+        uidSafe(24).then((uid) => {
+            callback(null, uid + path.extname(file.originalname));
+        });
+    },
+});
+
+const uploader = multer({
+    storage,
+    limits: {
+        fileSize: 2097152,
+    },
+});
+
 app.use(compression());
 app.use(express.json());
 
@@ -144,6 +166,30 @@ app.post("/reset-password-verify", (req, res) => {
         })
         .then(() => db.updatePassword(email, newpass))
         .catch((e) => console.log("error in reset-password-verify", e));
+});
+
+app.post(
+    "/update-profile-pic",
+    uploader.single("image"),
+    s3.upload,
+    (req, res) => {
+        let urlImage = `https://s3.amazonaws.com/spicedling/${req.file.filename}`;
+        db.updateProfilePic(req.session.userId, urlImage)
+            .then(({ rows }) => {
+                console.log("rows in update-profile-pic", rows);
+                res.json(rows);
+            })
+            .catch((e) => console.log("error in update-profile-pic", e));
+    }
+);
+
+app.get("/get-user", (req, res) => {
+    db.getUserData(req.session.userId)
+        .then(({ rows }) => {
+            console.log("rows in get-user", rows);
+            res.json(rows);
+        })
+        .catch((e) => console.log("error in get-user", e));
 });
 
 app.get("/user/id.json", function (req, res) {

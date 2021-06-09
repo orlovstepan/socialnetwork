@@ -3,13 +3,14 @@ import axios from "./axios";
 import { Component } from "react";
 import { Presentational } from "./profilePic";
 import Uploader from "./uploader";
+import Profile from "./profile";
 
 export default class App extends Component {
     constructor() {
         super();
         this.state = {
-            first: "Stepan",
-            last: "Orlov",
+            first: "",
+            last: "",
             imgUrl: "",
             uploaderIsVisible: false,
         };
@@ -17,8 +18,15 @@ export default class App extends Component {
     }
 
     componentDidMount() {
-        axios.get("/user/id.json").then(function ({ data }) {
+        console.log("this before axios get", this);
+        axios.get("/get-user").then(({ data }) => {
             console.log("data in componentdidmount", data);
+            console.log("this in componentDidMount", this);
+            this.setState({
+                first: data[0].first,
+                last: data[0].last,
+                imgUrl: data[0].profile_pic,
+            });
         });
     }
 
@@ -41,10 +49,14 @@ export default class App extends Component {
                     height="50px"
                     alt="logo"
                 />
+
+                {/* <Profile /> */}
+
                 <Presentational
-                    name={this.state.first}
-                    surname={this.state.last}
+                    first={this.state.first}
+                    last={this.state.last}
                     imgUrl={this.state.imgUrl}
+                    toggleModal={this.toggleModal}
                 />
             </>
         );
