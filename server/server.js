@@ -183,6 +183,23 @@ app.post(
     }
 );
 
+app.get("/bio", (req, res) => {
+    db.getBio(req.session.userId)
+        .then(({ rows }) => {
+            res.json(rows);
+        })
+        .catch((e) => console.log("error in get bio", e));
+});
+
+app.post("/bio", (req, res) => {
+    console.log("req.body in bio", req.body);
+    db.updateBio(req.session.userId, req.body.editText)
+        .then(({ rows }) => {
+            res.json(rows);
+        })
+        .catch((e) => console.log("error in update bio", e));
+});
+
 app.get("/get-user", (req, res) => {
     db.getUserData(req.session.userId)
         .then(({ rows }) => {

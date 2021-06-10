@@ -1,20 +1,19 @@
 // import { render } from "@testing-library/react";
+import { BrowserRouter, Route } from "react-router-dom";
 import axios from "./axios";
 import { Component } from "react";
-import { Presentational } from "./profilePic";
+import { ProfilePic } from "./profilePic";
 import Uploader from "./uploader";
-import Profile from "./profile";
+import { Profile } from "./profile";
 
 export default class App extends Component {
     constructor() {
         super();
         this.state = {
-            first: "",
-            last: "",
-            imgUrl: "",
             uploaderIsVisible: false,
         };
         this.toggleModal = this.toggleModal.bind(this);
+        this.updateBio = this.updateBio.bind(this);
     }
 
     componentDidMount() {
@@ -26,6 +25,7 @@ export default class App extends Component {
                 first: data[0].first,
                 last: data[0].last,
                 imgUrl: data[0].profile_pic,
+                bio: data[0].bio,
             });
         });
     }
@@ -36,29 +36,54 @@ export default class App extends Component {
         });
     }
 
+    updateBio(bioText) {
+        this.setState({
+            bio: bioText,
+        });
+    }
+
     render() {
         console.log("this.state in the app", this.state);
         return (
-            <>
-                <h1 onClick={this.toggleModal}>I am the app</h1>
-                {this.state.uploaderIsVisible && <Uploader />}
+            <BrowserRouter>
+                <>
+                    {this.state.uploaderIsVisible && <Uploader />}
 
-                <img
-                    src="/images/logo.png"
-                    width="50px"
-                    height="50px"
-                    alt="logo"
-                />
+                    <img
+                        src="/images/logo.png"
+                        width="50px"
+                        height="50px"
+                        alt="logo"
+                    />
+                    {/* <Route
+                        path="/"
+                        exact
+                        render={() => (
+                            <Profile
+                                first={this.state.first}
+                                last={this.state.last}
+                                imgUrl={this.state.imgUrl}
+                            />
+                        )}
+                    /> */}
+                    <Profile
+                        first={this.state.first}
+                        last={this.state.last}
+                        imgUrl={this.state.imgUrl}
+                        bio={this.state.bio}
+                        updateBio={this.updateBio}
+                    />
 
-                {/* <Profile /> */}
+                    {/* <Route path="/other-user" component={OtherProfile} /> */}
 
-                <Presentational
-                    first={this.state.first}
-                    last={this.state.last}
-                    imgUrl={this.state.imgUrl}
-                    toggleModal={this.toggleModal}
-                />
-            </>
+                    <ProfilePic
+                        first={this.state.first}
+                        last={this.state.last}
+                        imgUrl={this.state.imgUrl}
+                        toggleModal={this.toggleModal}
+                    />
+                </>
+            </BrowserRouter>
         );
     }
 }
