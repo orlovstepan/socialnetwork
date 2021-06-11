@@ -6,7 +6,7 @@ export function Profile(props) {
 
     return (
         <>
-            <h1>This is a Profile modal</h1>
+            <h2>Hi, {first} </h2>
             <ProfilePic id={id} first={first} last={last} imgUrl={imgUrl} />
             <BioEditor bio={bio} updateBio={updateBio} />
         </>

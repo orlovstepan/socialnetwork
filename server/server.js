@@ -209,6 +209,28 @@ app.get("/get-user", (req, res) => {
         .catch((e) => console.log("error in get-user", e));
 });
 
+app.get("/api/user/:id", (req, res) => {
+    if (req.session.userId == req.params.id) {
+        res.json({
+            sameUser: true,
+        });
+    } else {
+        db.getUserData(req.params.id)
+            .then(({ rows }) => {
+                if (!rows) {
+                    res.json({
+                        userExists: false,
+                    });
+                } else {
+                    res.json(rows);
+                }
+            })
+            .catch((e) =>
+                console.log("error in getting non-existent user data", e)
+            );
+    }
+});
+
 app.get("/user/id.json", function (req, res) {
     res.json({
         userId: req.session.userId,

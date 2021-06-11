@@ -5,6 +5,8 @@ import { Component } from "react";
 import { ProfilePic } from "./profilePic";
 import Uploader from "./uploader";
 import { Profile } from "./profile";
+import OtherProfile from "./otherProfile";
+import { findPeople } from "../../server/db/db";
 
 export default class App extends Component {
     constructor() {
@@ -19,8 +21,8 @@ export default class App extends Component {
     componentDidMount() {
         console.log("this before axios get", this);
         axios.get("/get-user").then(({ data }) => {
-            console.log("data in componentdidmount", data);
-            console.log("this in componentDidMount", this);
+            // console.log("data in componentdidmount", data);
+            // console.log("this in componentDidMount", this);
             this.setState({
                 first: data[0].first,
                 last: data[0].last,
@@ -48,14 +50,23 @@ export default class App extends Component {
             <BrowserRouter>
                 <>
                     {this.state.uploaderIsVisible && <Uploader />}
+                    <div className="upperBanner">
+                        <img
+                            src="/images/logo.png"
+                            width="50px"
+                            height="50px"
+                            alt="logo"
+                        />
+                        <ProfilePic
+                            first={this.state.first}
+                            last={this.state.last}
+                            imgUrl={this.state.imgUrl}
+                            toggleModal={this.toggleModal}
+                        />
+                    </div>
+                    <hr width="90%"></hr>
 
-                    <img
-                        src="/images/logo.png"
-                        width="50px"
-                        height="50px"
-                        alt="logo"
-                    />
-                    {/* <Route
+                    <Route
                         path="/"
                         exact
                         render={() => (
@@ -63,25 +74,14 @@ export default class App extends Component {
                                 first={this.state.first}
                                 last={this.state.last}
                                 imgUrl={this.state.imgUrl}
+                                bio={this.state.bio}
+                                updateBio={this.updateBio}
                             />
                         )}
-                    /> */}
-                    <Profile
-                        first={this.state.first}
-                        last={this.state.last}
-                        imgUrl={this.state.imgUrl}
-                        bio={this.state.bio}
-                        updateBio={this.updateBio}
                     />
 
-                    {/* <Route path="/other-user" component={OtherProfile} /> */}
-
-                    <ProfilePic
-                        first={this.state.first}
-                        last={this.state.last}
-                        imgUrl={this.state.imgUrl}
-                        toggleModal={this.toggleModal}
-                    />
+                    <Route path="/user/:id" component={OtherProfile} />
+                    <Route path="/users" component={findPeople} />
                 </>
             </BrowserRouter>
         );

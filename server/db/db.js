@@ -60,7 +60,7 @@ module.exports.updateProfilePic = (userId, imgUrl) => {
 
 module.exports.getUserData = (userId) => {
     const q = `
-    SELECT * FROM users WHERE id = $1
+    SELECT first, last, profile_pic, bio FROM users WHERE id = $1
     `;
     const params = [userId];
     return db.query(q, params);
@@ -82,4 +82,7 @@ module.exports.updateBio = (userId, bio) => {
     `;
     const params = [userId, bio];
     return db.query(q, params);
+};
+module.exports.findPeople = () => {
+    return db.query(`SELECT * FROM users ORDER BY id DESC LIMIT 3`);
 };
