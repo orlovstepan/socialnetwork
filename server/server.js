@@ -203,7 +203,7 @@ app.post("/bio", (req, res) => {
 app.get("/get-user", (req, res) => {
     db.getUserData(req.session.userId)
         .then(({ rows }) => {
-            console.log("rows in get-user", rows);
+            // console.log("rows in get-user", rows);
             res.json(rows);
         })
         .catch((e) => console.log("error in get-user", e));
@@ -245,6 +245,14 @@ app.get("/api/findusers/:search", (req, res) => {
             return res.json(rows);
         })
         .catch((e) => console.log("error in finding users server", e));
+});
+
+app.get("/api/friendship-status/:id", (req, res) => {
+    db.isFriend(req.session.userId, req.params.id)
+        .then(({ rows }) => {
+            return rows;
+        })
+        .catch((e) => console.log("error in friendship status", e));
 });
 
 app.get("/user/id.json", function (req, res) {

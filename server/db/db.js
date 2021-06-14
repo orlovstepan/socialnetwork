@@ -92,3 +92,15 @@ module.exports.findUser = (first) => {
     const params = [`${first}%`];
     return db.query(q, params);
 };
+
+module.exports.isFriend = (myId, otherUserId) => {
+    const q = `
+    SELECT * FROM friendships
+    WHERE (recipient_id = $1 AND sender_id = $2)
+    OR (recipient_id = $2 AND sender_id = $1);
+    `;
+
+    const params = [myId, otherUserId];
+
+    return db.query(q, params);
+};
