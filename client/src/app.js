@@ -6,7 +6,8 @@ import { ProfilePic } from "./profilePic";
 import Uploader from "./uploader";
 import { Profile } from "./profile";
 import OtherProfile from "./otherProfile";
-import { findPeople } from "../../server/db/db";
+// import { findPeople } from "../../server/db/db";
+import FindUsers from "./findUsers";
 
 export default class App extends Component {
     constructor() {
@@ -81,7 +82,7 @@ export default class App extends Component {
                     />
 
                     <Route path="/user/:id" component={OtherProfile} />
-                    <Route path="/users" component={findPeople} />
+                    <Route path="/users" component={FindUsers} />
                 </>
             </BrowserRouter>
         );

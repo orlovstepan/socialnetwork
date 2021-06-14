@@ -231,6 +231,22 @@ app.get("/api/user/:id", (req, res) => {
     }
 });
 
+app.get("/api/users", (req, res) => {
+    db.showUsers()
+        .then(({ rows }) => {
+            return res.json(rows);
+        })
+        .catch((e) => console.log("error in showing users server", e));
+});
+
+app.get("/api/findusers/:search", (req, res) => {
+    db.findUser(req.params.search)
+        .then(({ rows }) => {
+            return res.json(rows);
+        })
+        .catch((e) => console.log("error in finding users server", e));
+});
+
 app.get("/user/id.json", function (req, res) {
     res.json({
         userId: req.session.userId,
