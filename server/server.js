@@ -250,9 +250,45 @@ app.get("/api/findusers/:search", (req, res) => {
 app.get("/api/friendship-status/:id", (req, res) => {
     db.isFriend(req.session.userId, req.params.id)
         .then(({ rows }) => {
-            return rows;
+            if (rows.length == 0) {
+                return res.json({ requested: false });
+            } else {
+                if (rows[0].accepted === true) {
+                    return res.json({ accepted: true });
+                } else if (req.session.userId === rows[0].recipient_id) {
+                    return res.json({ accepted: false });
+                } else {
+                    return res.json({ cancel: true });
+                }
+            }
+            // return res.json(rows);
         })
         .catch((e) => console.log("error in friendship status", e));
+});
+
+app.post("/api/friendship-action", (req, res) => {
+    let { buttonText, id } = req.body;
+    if (buttonText === "Send friend request") {
+        db.sendFriendshipRequest(req.session.userId, id).then(({ rows }) => {
+            return res.json({ cancel: true });
+        });
+        //insert
+    } else if (buttonText === "Unfriend" || buttonText === "Cancel request") {
+        db.deleteFriend(req.session.userId, id).then(({ rows }) => {
+            return res.json({ requested: false });
+        });
+        //delete
+    } else {
+        db.acceptFriend(req.session.userId, id).then(({ rows }) => {
+            return res.json({ accepted: true });
+        });
+        //update
+    }
+});
+
+app.get("/logout", (req, res) => {
+    req.session = null;
+    res.redirect("/#/login");
 });
 
 app.get("/user/id.json", function (req, res) {

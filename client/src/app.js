@@ -1,5 +1,5 @@
 // import { render } from "@testing-library/react";
-import { BrowserRouter, Route } from "react-router-dom";
+import { BrowserRouter, Route, Link } from "react-router-dom";
 import axios from "./axios";
 import { Component } from "react";
 import { ProfilePic } from "./profilePic";
@@ -58,6 +58,16 @@ export default class App extends Component {
                             height="50px"
                             alt="logo"
                         />
+                        <div>
+                            <Link to="/">My profile </Link>
+                        </div>
+                        <div>
+                            <Link to="/users"> Search users</Link>
+                        </div>
+                        <div>
+                            <a href="/logout"> Log out </a>
+                        </div>
+
                         <ProfilePic
                             first={this.state.first}
                             last={this.state.last}

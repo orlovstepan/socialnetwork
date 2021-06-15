@@ -104,3 +104,31 @@ module.exports.isFriend = (myId, otherUserId) => {
 
     return db.query(q, params);
 };
+
+module.exports.sendFriendshipRequest = (myId, otherUserId) => {
+    const q = `
+    INSERT INTO friendships (sender_id, recipient_id)
+    VALUES ($1, $2)
+    RETURNING *
+    ;`;
+    const params = [myId, otherUserId];
+    return db.query(q, params);
+};
+
+module.exports.deleteFriend = (myId, otherUserId) => {
+    const q = `
+    DELETE FROM friendships 
+    WHERE (sender_id = $1 AND recipient_id = $2)
+    OR (recipient_id = $1 AND sender_id = $2)
+    RETURNING *
+    ;`;
+    const params = [myId || null, otherUserId || null];
+    return db.query(q, params);
+};
+
+module.exports.acceptFriend = (myId, otherUserId) => {
+    const q = `UPDATE friendships SET accepted = true WHERE (sender_id = $1 AND recipient_id = $2)
+        OR (recipient_id = $1 AND sender_id = $2) RETURNING *`;
+    const params = [myId || null, otherUserId || null];
+    return db.query(q, params);
+};

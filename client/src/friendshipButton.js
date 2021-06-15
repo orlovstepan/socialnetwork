@@ -3,14 +3,22 @@ import { useState, useEffect } from "react";
 import axios from "./axios";
 
 export default function FriendshipButton({ id }) {
-    const [buttonText, setButtonText] = useState("Make Friend Request");
+    const [buttonText, setButtonText] = useState("");
 
     useEffect(() => {
         console.log("about to make a request to /api/friendship-status");
         axios
             .get(`/api/friendship-status/${id}`)
             .then(({ data }) => {
-                console.log("data in friendship useEffect ", data);
+                if (data.requested == false) {
+                    setButtonText("Send friend request");
+                } else if (data.accepted == true) {
+                    setButtonText("Unfriend");
+                } else if (data.cancel == true) {
+                    setButtonText("Cancel request");
+                } else if (data.accepted == false) {
+                    setButtonText("Accept friend request");
+                }
             })
             .catch((e) => console.log("error in friendship status", e));
     }, []);
@@ -23,5 +31,23 @@ export default function FriendshipButton({ id }) {
 
     //the other thing is handle what happens when someone clicks the button
 
-    return <button onClick={() => setButtonText("WOW")}>{buttonText}</button>;
+    function sendRequest() {
+        axios
+            .post("/api/friendship-action", { buttonText, id })
+            .then(({ data }) => {
+                console.log("data");
+                if (data.requested == false) {
+                    setButtonText("Send friend request");
+                } else if (data.accepted == true) {
+                    setButtonText("Unfriend");
+                } else if (data.cancel == true) {
+                    setButtonText("Cancel request");
+                } else if (data.accepted == false) {
+                    setButtonText("Accept friend request");
+                }
+            })
+            .catch((e) => console.log("error in sendRequest", e));
+    }
+
+    return <button onClick={sendRequest}>{buttonText}</button>;
 }
