@@ -8,6 +8,7 @@ import { Profile } from "./profile";
 import OtherProfile from "./otherProfile";
 // import { findPeople } from "../../server/db/db";
 import FindUsers from "./findUsers";
+import Friends from "./friends";
 
 export default class App extends Component {
     constructor() {
@@ -65,6 +66,9 @@ export default class App extends Component {
                             <Link to="/users"> Search users</Link>
                         </div>
                         <div>
+                            <Link to="/friends"> Friends</Link>
+                        </div>
+                        <div>
                             <a href="/logout"> Log out </a>
                         </div>
 
@@ -92,6 +96,7 @@ export default class App extends Component {
                     />
 
                     <Route path="/user/:id" component={OtherProfile} />
+                    <Route path="/friends" component={Friends} />
                     <Route path="/users" component={FindUsers} />
                 </>
             </BrowserRouter>

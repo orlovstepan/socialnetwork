@@ -278,7 +278,7 @@ app.post("/api/friendship-action", (req, res) => {
             return res.json({ requested: false });
         });
         //delete
-    } else {
+    } else if (buttonText === "Accept friend request") {
         db.acceptFriend(req.session.userId, id).then(({ rows }) => {
             return res.json({ accepted: true });
         });
@@ -289,6 +289,17 @@ app.post("/api/friendship-action", (req, res) => {
 app.get("/logout", (req, res) => {
     req.session = null;
     res.redirect("/#/login");
+});
+
+app.get("/api/friends", (req, res) => {
+    console.log("got friends api");
+    let { id } = req.body;
+    db.getFriendsAndRequests(req.session.userId, id)
+        .then(({ rows }) => {
+            console.log("api/friend rows:", rows);
+            return res.json(rows);
+        })
+        .catch((e) => console.log("error in friends route", e));
 });
 
 app.get("/user/id.json", function (req, res) {
