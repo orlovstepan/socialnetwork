@@ -28,6 +28,23 @@ export default function reducer(state = {}, action) {
                 }
             }),
         };
+    } else if (action.type == "RECEIVE_LAST_10_MESSAGES") {
+        // console.log("HELLOOOOOOOO");
+        newState = {
+            ...state,
+            chatMessages: action.chatMessages.map((messages) => {
+                return messages;
+            }),
+        };
+        // console.log("newstate in aciton", newState);
+    } else if (action.type == "NEW_CHAT_MESSAGE") {
+        // console.log("HELLOOOOOOOO");
+        newState = {
+            ...state,
+            chatMessages: [...state.chatMessages, action.chatMessage],
+        };
+        // console.log("newstate in aciton", newState);
     }
+
     return newState;
 }

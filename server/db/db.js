@@ -88,7 +88,7 @@ module.exports.showUsers = () => {
 };
 
 module.exports.findUser = (first) => {
-    const q = `SELECT id, first, last, profile_pic FROM users WHERE first ILIKE $1 OR last ILIKE $1 ORDER BY last ASC`;
+    const q = `SELECT id, first, last, profile_pic FROM users WHERE first ILIKE $1 OR last ILIKE $1 ORDER BY last ASC;`;
     const params = [`${first}%`];
     return db.query(q, params);
 };
@@ -128,7 +128,7 @@ module.exports.deleteFriend = (myId, otherUserId) => {
 
 module.exports.acceptFriend = (myId, otherUserId) => {
     const q = `UPDATE friendships SET accepted = true WHERE (sender_id = $1 AND recipient_id = $2)
-        OR (recipient_id = $1 AND sender_id = $2) RETURNING *`;
+        OR (recipient_id = $1 AND sender_id = $2) RETURNING *;`;
     const params = [myId || null, otherUserId || null];
     return db.query(q, params);
 };
@@ -141,7 +141,40 @@ module.exports.getFriendsAndRequests = (userId) => {
       ON (accepted = false AND recipient_id = $1 AND sender_id = users.id)
       OR (accepted = true AND recipient_id = $1 AND sender_id = users.id)
       OR (accepted = true AND sender_id = $1 AND recipient_id = users.id)
-  `;
+  ;`;
     const params = [userId || null];
+    return db.query(q, params);
+};
+
+// module.exports.getLastChatMessages = (userId) => {
+//     const q = `
+//       SELECT users.id, first, last, profile_pic, message
+//       FROM chat
+//       JOIN users
+//       ON (sender_id = $1)
+//       LIMIT 10
+//   ;`;
+//     const params = [userId || null];
+//     return db.query(q, params);
+// };
+
+module.exports.getLastChatMessages = () => {
+    return db.query(`
+      SELECT users.id, first, last, profile_pic, chat.message, chat.created_at
+      FROM users
+      JOIN chat
+      ON (sender_id = users.id)
+      ORDER BY chat.id DESC
+      LIMIT 10
+  ;`);
+};
+
+module.exports.insertChatMessage = (userId, message) => {
+    const q = `
+     INSERT INTO chat(sender_id, message)
+     VALUES ($1, $2)
+     RETURNING *
+  ;`;
+    const params = [userId || null, message || null];
     return db.query(q, params);
 };

@@ -12,6 +12,12 @@ const { sendEmail } = require("./ses");
 const multer = require("multer");
 const s3 = require("../s3");
 const uidSafe = require("uid-safe");
+// const { chatMessages } = require("../client/src/actions");
+const server = require("http").Server(app);
+const io = require("socket.io")(server, {
+    allowRequest: (req, callback) =>
+        callback(null, req.headers.referer.startsWith("http://localhost:3000")),
+});
 
 // const requireLoggedInUser = require("../../server/middleware");
 const COOKIE_SECRET =
@@ -38,13 +44,25 @@ const uploader = multer({
 app.use(compression());
 app.use(express.json());
 
-app.use(
-    cookieSession({
-        secret: COOKIE_SECRET,
-        maxAge: 1000 * 60 * 60 * 24 * 14,
-        sameSite: "strict",
-    })
-);
+// app.use(
+//     cookieSession({
+//         secret: COOKIE_SECRET,
+//         maxAge: 1000 * 60 * 60 * 24 * 14,
+//         sameSite: "strict",
+//     })
+// );
+
+const cookieSessionMiddleware = cookieSession({
+    secret: `COOKIE_SECRET`,
+    maxAge: 1000 * 60 * 60 * 24 * 90,
+    sameSite: "strict",
+});
+
+app.use(cookieSessionMiddleware);
+
+io.use(function (socket, next) {
+    cookieSessionMiddleware(socket.request, socket.request.res, next);
+});
 
 app.use(csurf());
 
@@ -313,6 +331,54 @@ app.get("*", function (req, res) {
     res.sendFile(path.join(__dirname, "..", "client", "index.html"));
 });
 
-app.listen(process.env.PORT || 3001, function () {
+server.listen(process.env.PORT || 3001, function () {
     console.log("I'm listening.");
 });
+
+io.on("connection", async function (socket) {
+    if (!socket.request.session.userId) {
+        return socket.disconnect(true);
+    }
+
+    const userId = socket.request.session.userId;
+    console.log("userId in sockets", userId);
+
+    const last10ChatMessages = await db.getLastChatMessages();
+
+    console.log("last10messages", last10ChatMessages.rows);
+    io.sockets.emit("chatMessages", last10ChatMessages.rows.reverse());
+
+    socket.on("new chat message", async (msg) => {
+        console.log("msg on the server", msg);
+        const chatMessage = await db.insertChatMessage(userId, msg);
+        const chatUser = await db.getUserData(userId);
+        // console.log("ChatMessage", chatMessage);
+        // console.log("ChatUser", chatUser.rows[0].first);
+        const newChat = {
+            id: chatMessage.rows[0].sender_id,
+            first: chatUser.rows[0].first,
+            last: chatUser.rows[0].last,
+            image: chatUser.rows[0].profile_pic,
+            message: chatMessage.rows[0].message,
+            created_at: chatMessage.rows[0].created_at,
+        };
+        io.sockets.emit("chatMessage", newChat);
+    });
+});
+
+// io.on("connection", (socket) => {
+//     console.log(`socket with id: ${socket.id} connected`);
+
+//     socket.emit("hi", {
+//         cohort: "Clove",
+//         socketId: socket.id,
+//     });
+
+//     socket.on("this is so cool", (data) => {
+//         console.log("client emitted something cool:", data);
+//     });
+
+//     socket.on("disconnect", (socket) => {
+//         console.log(`socket with id: ${socket.id} has just disconnected`);
+//     });
+// });

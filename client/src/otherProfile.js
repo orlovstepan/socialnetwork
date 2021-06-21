@@ -33,13 +33,17 @@ export default class OtherProfile extends Component {
 
     render() {
         return (
-            <>
-                <img src={this.state.profile_pic} />
-                <h2>{this.state.first}</h2>
-                <h2>{this.state.last}</h2>
-                <h5>{this.state.bio}</h5>
+            <div className="otherProfileContainer">
+                <img id="otherProfilePic" src={this.state.profile_pic} />
+                <h2>
+                    {this.state.first} {this.state.last}
+                </h2>
+
+                <h3> About {this.state.first} :</h3>
+
+                <h5> {this.state.bio}</h5>
                 <FriendshipButton id={this.props.match.params.id} />
-            </>
+            </div>
         );
     }
 }

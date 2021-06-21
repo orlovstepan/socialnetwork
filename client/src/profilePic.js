@@ -6,10 +6,9 @@ export function ProfilePic({ first, last, imgUrl, toggleModal }) {
     return (
         <div>
             <img
+                id="profilePic"
                 src={imgUrl}
                 alt={first}
-                width="100px"
-                height="100px"
                 onClick={toggleModal}
             />
         </div>

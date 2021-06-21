@@ -34,20 +34,29 @@ export default class Uploader extends Component {
 
     render() {
         return (
-            <>
+            <div id="uploader">
                 <h3> Change your profile picture </h3>
-                <form>
+                <form id="uploaderForm">
+                    <label id="profilePicLabel" htmlFor="profilePicUploader">
+                        select Image
+                    </label>
                     <input
-                        name={"profilePic"}
-                        type={"file"}
+                        style={{ visibility: "hidden" }}
+                        id="profilePicUploader"
+                        name="profilePic"
+                        type="file"
                         accept="image/*"
                         onChange={this.handleChange}
                     ></input>
-                    <button type={"submit"} onClick={this.handleSubmit}>
-                        Change my profile picture
-                    </button>
                 </form>
-            </>
+                <button
+                    id="changeProfilePicBtn"
+                    type={"submit"}
+                    onClick={this.handleSubmit}
+                >
+                    Change my profile picture
+                </button>
+            </div>
         );
     }
 }

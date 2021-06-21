@@ -9,6 +9,7 @@ import OtherProfile from "./otherProfile";
 // import { findPeople } from "../../server/db/db";
 import FindUsers from "./findUsers";
 import Friends from "./friends";
+import Chat from "./chat";
 
 export default class App extends Component {
     constructor() {
@@ -51,12 +52,11 @@ export default class App extends Component {
         return (
             <BrowserRouter>
                 <>
-                    {this.state.uploaderIsVisible && <Uploader />}
                     <div className="upperBanner">
                         <img
                             src="/images/logo.png"
-                            width="50px"
-                            height="50px"
+                            width="100px"
+                            height="100px"
                             alt="logo"
                         />
                         <div>
@@ -79,6 +79,10 @@ export default class App extends Component {
                             toggleModal={this.toggleModal}
                         />
                     </div>
+                    <div className="uploader">
+                        {this.state.uploaderIsVisible && <Uploader />}
+                    </div>
+
                     <hr width="90%"></hr>
 
                     <Route
@@ -98,6 +102,7 @@ export default class App extends Component {
                     <Route path="/user/:id" component={OtherProfile} />
                     <Route path="/friends" component={Friends} />
                     <Route path="/users" component={FindUsers} />
+                    <Route path="/chat" component={Chat} />
                 </>
             </BrowserRouter>
         );
