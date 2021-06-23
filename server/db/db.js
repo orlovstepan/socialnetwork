@@ -60,7 +60,7 @@ module.exports.updateProfilePic = (userId, imgUrl) => {
 
 module.exports.getUserData = (userId) => {
     const q = `
-    SELECT first, last, profile_pic, bio FROM users WHERE id = $1
+    SELECT id, first, last, profile_pic, bio FROM users WHERE id = $1
     `;
     const params = [userId];
     return db.query(q, params);
@@ -84,7 +84,7 @@ module.exports.updateBio = (userId, bio) => {
     return db.query(q, params);
 };
 module.exports.showUsers = () => {
-    return db.query(`SELECT * FROM users ORDER BY id DESC LIMIT 3`);
+    return db.query(`SELECT * FROM users ORDER BY id DESC LIMIT 30`);
 };
 
 module.exports.findUser = (first) => {
@@ -176,5 +176,29 @@ module.exports.insertChatMessage = (userId, message) => {
      RETURNING *
   ;`;
     const params = [userId || null, message || null];
+    return db.query(q, params);
+};
+
+module.exports.insertWallPost = (userId, otherId, wallpost) => {
+    const q = `
+     INSERT INTO wallpost(sender_id, recipient_id, wallpost)
+     VALUES ($1, $2, $3)
+     RETURNING *
+  ;`;
+    const params = [userId || null, otherId || null, wallpost || null];
+    return db.query(q, params);
+};
+
+module.exports.getLastWallPosts = (userId) => {
+    const q = `
+      SELECT users.id, first, last, profile_pic, wallpost, wallpost.created_at
+      FROM users
+      JOIN wallpost
+      ON (sender_id = users.id)
+      WHERE recipient_id = $1
+      ORDER BY wallpost.id DESC
+      LIMIT 10
+  ;`;
+    const params = [userId];
     return db.query(q, params);
 };

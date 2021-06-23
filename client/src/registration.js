@@ -38,7 +38,7 @@ export class Registration extends React.Component {
 
     render() {
         return (
-            <>
+            <div className="registration">
                 <h1>Welcome!</h1>
                 {this.state.error && (
                     <p>Something went wrong, please try again</p>
@@ -73,9 +73,9 @@ export class Registration extends React.Component {
                     <button type={"submit"}>Submit</button>
                 </form>
                 <h5>
-                    Or login <Link to="/login"> here</Link>
+                    <Link to="/login"> Or login here</Link>
                 </h5>
-            </>
+            </div>
         );
     }
 }

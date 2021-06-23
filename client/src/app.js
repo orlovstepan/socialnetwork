@@ -26,11 +26,14 @@ export default class App extends Component {
         axios.get("/get-user").then(({ data }) => {
             // console.log("data in componentdidmount", data);
             // console.log("this in componentDidMount", this);
+            console.log("ID IN COMPONENT MOUNTED", data[0].id);
+
             this.setState({
                 first: data[0].first,
                 last: data[0].last,
                 imgUrl: data[0].profile_pic,
                 bio: data[0].bio,
+                id: data[0].id,
             });
         });
     }
@@ -53,12 +56,7 @@ export default class App extends Component {
             <BrowserRouter>
                 <>
                     <div className="upperBanner">
-                        <img
-                            src="/images/logo.png"
-                            width="100px"
-                            height="100px"
-                            alt="logo"
-                        />
+                        <img id="logo" src="/images/logo.png" alt="logo" />
                         <div>
                             <Link to="/">My profile </Link>
                         </div>
@@ -67,6 +65,9 @@ export default class App extends Component {
                         </div>
                         <div>
                             <Link to="/friends"> Friends</Link>
+                        </div>
+                        <div>
+                            <Link to="/chat"> Forum </Link>
                         </div>
                         <div>
                             <a href="/logout"> Log out </a>
@@ -95,6 +96,7 @@ export default class App extends Component {
                                 imgUrl={this.state.imgUrl}
                                 bio={this.state.bio}
                                 updateBio={this.updateBio}
+                                id={this.state.id}
                             />
                         )}
                     />

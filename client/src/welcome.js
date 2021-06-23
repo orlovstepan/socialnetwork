@@ -6,7 +6,7 @@ import { Reset } from "./resetPassword";
 export function Welcome() {
     return (
         <div id="welcome">
-            <img src="../images/logo.png" width="50px" height="50px" />
+            <img id="logo" src="../images/logo.png" />
             <HashRouter>
                 <div>
                     <Route exact path="/" component={Registration} />

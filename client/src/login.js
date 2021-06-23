@@ -43,9 +43,10 @@ export class Login extends React.Component {
 
     render() {
         return (
-            <>
+            <div className="login">
                 {this.state.error && <p>{this.state.errorMsg}</p>}
                 <form onSubmit={(e) => this.handleSubmit(e)}>
+                    <h3>Please login </h3>
                     <input
                         name={"email"}
                         placeholder={"Email"}
@@ -63,10 +64,10 @@ export class Login extends React.Component {
                     <button type={"submit"}>Log in</button>
                 </form>
                 <h5>
-                    <Link to="/"> Register here </Link> or
-                    <Link to="/reset-password"> reset </Link> your password
+                    <Link to="/"> Register here </Link> <br></br> or <br></br>
+                    <Link to="/reset-password"> reset your password </Link>
                 </h5>
-            </>
+            </div>
         );
     }
 }

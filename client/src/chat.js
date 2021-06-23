@@ -35,7 +35,7 @@ export default function Chat() {
 
     return (
         <div className="chat">
-            <h1> Chat room</h1>
+            <h1> Forum </h1>
             <div className="chat-container" ref={elementRef}>
                 <ul>
                     {chatMessages &&
@@ -52,7 +52,8 @@ export default function Chat() {
                 </ul>
             </div>
             <textarea
-                placeholder="Add your chat here"
+                id="chatInput"
+                placeholder="Say something"
                 onKeyDown={keyCheck}
             ></textarea>
         </div>

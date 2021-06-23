@@ -1,4 +1,5 @@
 DROP TABLE IF EXISTS chat;
+DROP TABLE IF EXISTS wallpost;
 DROP TABLE IF EXISTS reset_codes;
 DROP TABLE IF EXISTS friendships;
 DROP TABLE IF EXISTS users;
@@ -34,6 +35,17 @@ CREATE TABLE chat(
   message VARCHAR,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP     
 );
+
+
+CREATE TABLE wallpost(
+  id SERIAL PRIMARY KEY,
+  wallpost VARCHAR,
+  sender_id INT REFERENCES users(id) NOT NULL,
+  recipient_id INT REFERENCES users(id) NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP     
+);
+
+
 
  
 

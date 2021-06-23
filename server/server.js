@@ -221,7 +221,7 @@ app.post("/bio", (req, res) => {
 app.get("/get-user", (req, res) => {
     db.getUserData(req.session.userId)
         .then(({ rows }) => {
-            // console.log("rows in get-user", rows);
+            console.log("rows in get-user", rows);
             res.json(rows);
         })
         .catch((e) => console.log("error in get-user", e));
@@ -345,8 +345,14 @@ io.on("connection", async function (socket) {
 
     const last10ChatMessages = await db.getLastChatMessages();
 
-    console.log("last10messages", last10ChatMessages.rows);
+    // console.log("last10messages", last10ChatMessages.rows);
     io.sockets.emit("chatMessages", last10ChatMessages.rows.reverse());
+
+    socket.on("get wall posts", async (id) => {
+        const lastWallPosts = await db.getLastWallPosts(id);
+        // console.log("receining wallposts", lastWallPosts);
+        socket.emit("last10", lastWallPosts.rows.reverse());
+    });
 
     socket.on("new chat message", async (msg) => {
         console.log("msg on the server", msg);
@@ -358,11 +364,27 @@ io.on("connection", async function (socket) {
             id: chatMessage.rows[0].sender_id,
             first: chatUser.rows[0].first,
             last: chatUser.rows[0].last,
-            image: chatUser.rows[0].profile_pic,
+            profile_pic: chatUser.rows[0].profile_pic,
             message: chatMessage.rows[0].message,
             created_at: chatMessage.rows[0].created_at,
         };
         io.sockets.emit("chatMessage", newChat);
+    });
+
+    socket.on("new wallpost", async (post, recipient_id) => {
+        const wallPost = await db.insertWallPost(userId, recipient_id, post);
+        const chatUser = await db.getUserData(userId);
+        // console.log("ChatMessage", chatMessage);
+        // console.log("ChatUser", chatUser.rows[0].first);
+        const newPost = {
+            id: wallPost.rows[0].sender_id,
+            first: chatUser.rows[0].first,
+            last: chatUser.rows[0].last,
+            profile_pic: chatUser.rows[0].profile_pic,
+            wallpost: wallPost.rows[0].wallpost,
+            created_at: wallPost.rows[0].created_at,
+        };
+        socket.emit("lastWallPost", newPost);
     });
 });
 

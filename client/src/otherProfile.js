@@ -1,17 +1,30 @@
 import { Component } from "react";
 import axios from "./axios";
 import FriendshipButton from "./friendshipButton";
+import WallPosts from "./wallposts";
 
 export default class OtherProfile extends Component {
     constructor(props) {
         super(props);
         this.state = {
             userExists: true,
+            showWall: false,
         };
     }
     componentDidMount() {
         // console.log("Other profiles component mounted");
         const id = this.props.match.params.id;
+
+        axios
+            .get(`/api/friendship-status/${id}`)
+            .then(({ data }) => {
+                let showWall = data.accepted;
+                this.setState({ showWall: showWall });
+            })
+            .catch((err) => {
+                console.log("err DATA IN THEN FIND USER: ", err);
+            });
+
         axios
             .get(`/api/user/${id}`)
             .then(({ data }) => {
@@ -43,6 +56,12 @@ export default class OtherProfile extends Component {
 
                 <h5> {this.state.bio}</h5>
                 <FriendshipButton id={this.props.match.params.id} />
+
+                {this.state.showWall ? (
+                    <WallPosts id={this.props.match.params.id} />
+                ) : (
+                    ""
+                )}
             </div>
         );
     }

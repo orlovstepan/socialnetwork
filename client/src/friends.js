@@ -25,7 +25,7 @@ export default function Friends() {
     }, []);
 
     return (
-        <div>
+        <div className="friendsContainer">
             <h3>Friends</h3>
             <ul>
                 {friends &&
@@ -33,9 +33,14 @@ export default function Friends() {
                         <li key={each.id}>
                             <Link to={`/user/${each.id}`}>
                                 <img height="100px" src={each.profile_pic} />
-                                {each.first} {each.last}
+                                <p>
+                                    {each.first} {each.last}
+                                </p>
                             </Link>
-                            <button onClick={() => dispatch(unfriend(each.id))}>
+                            <button
+                                className="friendBtn"
+                                onClick={() => dispatch(unfriend(each.id))}
+                            >
                                 Unfriend
                             </button>
                         </li>
